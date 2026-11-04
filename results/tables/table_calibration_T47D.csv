@@ -1,0 +1,8 @@
+"readout","model","observed","source"
+"PTxR + abemaciclib switch (clinical exposure)","controlled (responds)","responds (decreased %GEM+/Ki67/colony, apoptosis)","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"PTxR + palbociclib (drug that drove resistance)","grows (resistant)","resistant (selected under palbociclib)","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"ATxR + palbociclib switch (clinical exposure)","grows (resistant)","cross-resistant (no decrease %GEM+/Ki67/colony)","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"ATxR + ribociclib switch (clinical exposure)","grows (resistant)","partial / non-significant trend","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"Potency fold-differential, pRB suppression (ATxR-palbo / PTxR-abema)","14.4x","~8.8x (2200 vs 250 nM pRB; >9.7x by IC50)","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"CDK6 level, ATxR vs PTxR (model contexts)","1.54x","~1.8x (CDK6 enriched in ATxR)","Zapatero-Solana 2025 (10.3390/ijms26062643)"
+"CDK2 capacity, ATxR vs PTxR (model contexts)","1.05x","~1.5x (CDK2/cyclinD greater in ATxR)","Zapatero-Solana 2025 (10.3390/ijms26062643)"

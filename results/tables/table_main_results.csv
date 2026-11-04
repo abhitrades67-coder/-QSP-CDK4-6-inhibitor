@@ -1,0 +1,5 @@
+"Trial","Experimental regimen","Control PFS obs","Control PFS pred","Exp PFS obs","Exp PFS pred","HR obs","HR pred"
+"MAINTAIN","switch to ribociclib + ET",2.76,2.76,5.29,3.12,0.57,0.62
+"PACE","continue palbociclib + fulvestrant",4.8,4.76,4.6,4.8,1.11,0.99
+"postMONARCH","switch to abemaciclib + fulvestrant",5.3,5.29,6,6.19,0.73,0.56
+"PALMIRA","rechallenge palbociclib + ET",3.6,3.58,4.9,3.61,0.84,0.99

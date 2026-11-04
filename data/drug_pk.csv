@@ -1,0 +1,5 @@
+drug,dose_schedule,mw_g_per_mol,css_total_nM,fraction_unbound,css_unbound_nM,cdk4_6_cell_ic50_nM,relative_cdk4_6_potency,rb_target_coverage,off_target_breadth,cytotoxic_capacity,notes
+palbociclib,125 mg QD 3wk-on 1wk-off,447.5,250,0.15,38,40,1.00,0.70,0.10,0.10,narrow CDK4/6; cytostatic; low unbound fraction
+ribociclib,600 mg QD 3wk-on 1wk-off,434.5,2000,0.30,600,90,0.75,0.78,0.20,0.15,intermediate; higher free exposure offsets lower per-molecule potency
+abemaciclib,150 mg BID continuous,506.6,400,0.03,12,20,2.00,0.92,0.60,0.45,continuous dosing; active metabolites M2/M20; broad CDK target; cytostatic+cytotoxic
+notes_row,"css values are literature-informed approximations expressed as effective active exposure (parent + active metabolites folded in); the model uses rb_target_coverage and relative_cdk4_6_potency as the calibratable PD anchors, not raw ng/mL",NA,NA,NA,NA,NA,NA,NA,NA,NA,see proposal section 6.3 for provenance and caveats

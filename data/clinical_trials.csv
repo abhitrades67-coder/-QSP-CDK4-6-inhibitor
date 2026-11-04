@@ -1,0 +1,10 @@
+trial,arm,regimen,n,median_pfs_months,pfs_ci_low,pfs_ci_high,hr_vs_control,hr_ci_low,hr_ci_high,prior_cdk46i,second_cdk46i,et_switched,is_control,source
+MAINTAIN,control,switched ET + placebo,58,2.76,2.66,3.25,1.00,NA,NA,palbociclib_87pct,none,yes,1,Kalinsky 2023 JCO 10.1200/JCO.22.02392
+MAINTAIN,experimental,switched ET + ribociclib,61,5.29,3.02,8.12,0.57,0.39,0.85,palbociclib_87pct,ribociclib,yes,0,Kalinsky 2023 JCO 10.1200/JCO.22.02392
+PACE,control,fulvestrant,55,4.80,NA,NA,1.00,NA,NA,palbociclib_91pct,none,yes,1,Mayer 2024 JCO 10.1200/JCO.23.01940
+PACE,experimental,fulvestrant + palbociclib,111,4.60,NA,NA,1.11,0.79,1.55,palbociclib_91pct,palbociclib_same,yes,0,Mayer 2024 JCO 10.1200/JCO.23.01940
+PACE,exp_avelumab,fulvestrant + palbociclib + avelumab,54,8.10,NA,NA,0.75,0.50,1.12,palbociclib_91pct,palbociclib_same,yes,0,Mayer 2024 JCO 10.1200/JCO.23.01940
+postMONARCH,control,fulvestrant + placebo,186,5.30,3.70,5.60,1.00,NA,NA,palbo_ribo_mixed,none,yes,1,Kalinsky 2024 JCO 10.1200/JCO-24-02086
+postMONARCH,experimental,fulvestrant + abemaciclib,182,6.00,5.60,8.60,0.73,0.57,0.95,palbo_ribo_mixed,abemaciclib,yes,0,Kalinsky 2024 JCO 10.1200/JCO-24-02086
+PALMIRA,control,second-line ET,62,3.60,2.50,4.20,1.00,NA,NA,palbociclib_100pct,none,yes,1,Llombart-Cussac 2025 JCO 10.1200/JCO-24-01865
+PALMIRA,experimental,palbociclib rechallenge + ET,136,4.90,3.60,6.10,0.84,0.66,1.07,palbociclib_100pct,palbociclib_same,yes,0,Llombart-Cussac 2025 JCO 10.1200/JCO-24-01865

@@ -1,0 +1,14 @@
+readout,resistant_model,treatment,value,units,direction,notes,source
+GEM_percent_resistant_steadystate,PTxR,palbociclib+tamoxifen (maintenance),11,percent,NA,proliferating fraction at established resistance,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+GEM_percent_resistant_steadystate,ATxR,abemaciclib+tamoxifen (maintenance),10,percent,NA,proliferating fraction at established resistance,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+pRB_depletion_conc,PTxR,abemaciclib+fulvestrant,250,nM,near-complete pRB depletion,switch to opposing potent CDK4/6i restores pRB inhibition,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+pRB_depletion_conc,ATxR,palbociclib+fulvestrant,2200,nM,near-complete pRB depletion,switch to palbociclib needs ~9x higher conc,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+IC50_Fu_corrected,PTxR,abemaciclib+fulvestrant,1.1,uM,lower=more sensitive,retained sensitivity after palbociclib resistance,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+IC50_Fu_corrected,ATxR,palbociclib+fulvestrant,10.7,uM,lower=more sensitive,cross-resistant (>10.7 uM),Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+CDK6_relative,ATxR,baseline,1.8,fold_vs_PTxR,higher=more resistant,CDK6 enriched in ATxR vs PTxR,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+CDK6_relative,PTxR,baseline,1.0,fold_vs_PTxR,reference,lower CDK6,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+CDK4_p21_interaction,PTxR,baseline,1.6,fold_vs_ATxR,higher=more sensitive,CDK4-p21 complex greater in PTxR (sensitising),Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+CDK2_relative,ATxR,baseline,1.5,fold_vs_PTxR,higher=more bypass,CDK2/cyclinD greater in ATxR,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+response_switch,PTxR,abemaciclib+fulvestrant,1,binary_responds,1=responds,decreased GEM/Ki67/colony + apoptosis,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+response_switch,ATxR,palbociclib+fulvestrant,0,binary_responds,0=cross-resistant,no decrease in GEM/Ki67/colony,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
+response_switch,ATxR,ribociclib+fulvestrant,0.4,binary_responds,partial,modest/non-significant trend,Zapatero-Solana 2025 IJMS 10.3390/ijms26062643
