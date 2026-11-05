@@ -26,6 +26,11 @@ Two mechanistic rules are the heart of the model:
    palbociclib, re-using palbociclib retains only ~12% of its effect, whereas a
    *switch* to a different agent retains full state-specific activity.
 
+The pipeline runs end to end (`R/00`–`07` + `99_run_all.R`): model, preclinical
+calibration, virtual-population trial simulation, competing-hypothesis testing,
+global sensitivity, and a **verification + out-of-sample validation** stage
+(leave-one-trial-out cross-validation and bootstrap prediction intervals).
+
 ---
 
 ## 2. The mechanistic picture (Figure 1)
@@ -41,10 +46,14 @@ Net tumour-subpopulation growth rate by resistance state × treatment
 | RB loss (agnostic) | grows | grows | grows | grows |
 | ER reactivation (ESR1) | grows | grows | **controlled** | **controlled** |
 
-The CDK4/6-**agnostic** clones (CDK2-bypass, RB-loss) are untouched by *any*
-CDK4/6i; the **drug-dependent** CDK6-remodelling clone is re-controlled only by a
+The CDK4/6-**agnostic** clones are essentially untouched by *any* CDK4/6i
+(RB-loss exactly so; CDK2-bypass retains only a small abemaciclib off-target
+effect); the **drug-dependent** CDK6-remodelling clone is re-controlled only by a
 *switch* to a more potent agent, never by re-challenging the already-failed
 palbociclib. This is the mechanistic basis of the entire clinical dichotomy.
+Representative signalling/volume trajectories under an abemaciclib switch (pRB
+suppression and subpopulation volume for each clone) are in Figure 8
+(`fig08_trajectories.png`).
 
 ---
 
@@ -113,7 +122,7 @@ and mapping each trial's experimental-arm PFS against it:
 
 ---
 
-## 6. Competing-hypothesis test (Figure 6, Table `table_hypothesis_tests.csv`)
+## 6. Competing-hypothesis test (Figures 6, 9; Table `table_hypothesis_tests.csv`)
 
 Testing fixed composition hypotheses against the four observed HRs:
 
@@ -133,27 +142,70 @@ best *shared* calibrated composition is therefore heavily agnostic
 modest switch benefits imply that most post-palbociclib resistance is
 CDK4/6-agnostic, with only a minority of clones re-engageable by a switch.** No
 single fixed composition reproduces all four trials exactly — the aggregate data
-do not uniquely identify the mechanism.
+do not uniquely identify the mechanism. The best shared calibrated composition is
+shown in Figure 9 (`fig09_composition.png`).
 
 ---
 
-## 7. Global sensitivity (Figure 10, Table `table_sensitivity_prcc.csv`)
+## 7. Model verification and out-of-sample validation (Figures 11–12; Tables `table_verification.csv`, `table_loo_cv.csv`, `table_prediction_intervals.csv`, `table_validation_summary.csv`)
 
-PRCC of predicted switch-trial HRs against model parameters (220 LHS samples):
+### 7.1 Model verification
+Seven automated checks all pass (`07_validation.R`): (i) the closed-form net
+growth rate used in the population layer matches the full `lsoda` ODE late-time
+growth rate to <1e-6; (ii) the ER ODE reaches its analytic steady state; (iii)
+the G1/S fixed point is **seed-independent** (identical from E2F seeds 0.02/0.5/0.98
+— no hidden hysteresis); (iv) the RB-loss clone is exactly CDK4/6i-agnostic; (v)
+the prior-drug rule makes palbociclib re-challenge ≈ ET; (vi) median PFS is
+monotone decreasing in aggressiveness; (vii) the RECIST threshold equals +20%
+diameter (1.728× volume).
 
-- **Switch-responsive fraction f_sr** dominates (PRCC ≈ −0.95): the single
-  biggest driver of benefit.
-- **CDK2 bypass strength** (CDK2 capacity +0.90, RB-phosphorylation-by-CDK2
-  +0.76, cyclin-E synthesis +0.79): more bypass → less benefit.
+### 7.2 Leave-one-trial-out cross-validation (genuine out-of-sample prediction)
+Because the shared composition in §4 is calibrated using all four experimental
+arms, we additionally performed **leave-one-trial-out cross-validation**: for each
+trial, the composition is re-calibrated on the *other three* trials only, and the
+held-out trial's HR is **predicted out of sample**.
+
+| Held-out trial | trained on | HR obs (CI) | HR predicted (out-of-sample) | within CI |
+|---|---|---|---|---|
+| MAINTAIN | PACE+postMONARCH+PALMIRA | 0.57 (0.39–0.85) | **0.69** | ✓ |
+| PACE | MAINTAIN+postMONARCH+PALMIRA | 1.11 (0.79–1.55) | **0.99** | ✓ |
+| postMONARCH | MAINTAIN+PACE+PALMIRA | 0.73 (0.57–0.95) | **0.28** | ✗ (over-predicts) |
+| PALMIRA | MAINTAIN+PACE+postMONARCH | 0.84 (0.66–1.07) | **0.99** | ✓ |
+
+**Three of four held-out HRs fall within the observed CI** — the model has genuine
+out-of-sample predictive validity for MAINTAIN, PACE and PALMIRA. postMONARCH is
+again the one outlier (over-predicted abemaciclib benefit), consistent with the
+in-sample residual (Figure 12).
+
+### 7.3 Prediction intervals and goodness of fit
+Bootstrap virtual-population intervals on the calibrated predictions are tight
+(e.g. MAINTAIN HR 0.62 [0.60–0.64]; postMONARCH 0.56 [0.54–0.58]), reflecting the
+Monte-Carlo precision of the point prediction (Figure 11; these are sampling
+intervals, not full parameter-uncertainty intervals). Overall goodness of fit:
+**experimental-arm median-PFS RMSE = 1.27 months; log-HR RMSE = 0.169; 3/4
+predicted HRs within the observed CI; 3/4 correct direction** (PACE and PALMIRA
+are both correctly predicted as null, HR≈1 with CI crossing 1).
+
+---
+
+## 8. Global sensitivity (Figure 10, Table `table_sensitivity_prcc.csv`)
+
+PRCC of predicted switch-trial HRs against model parameters (220 LHS samples;
+values below are from the canonical `99_run_all.R` run):
+
+- **Switch-responsive fraction f_sr** dominates (PRCC ≈ −0.92 on both switch HRs):
+  the single biggest driver of benefit.
+- **CDK2 bypass strength** (CDK2 capacity +0.86, RB-phosphorylation-by-CDK2 +0.70,
+  cyclin-E synthesis +0.71): more bypass → less benefit.
 - **Agent-specific and trial-specific:** the **ribociclib** CDK6 penalty affects
-  **MAINTAIN** HR only (+0.47); the **abemaciclib** penalty affects
-  **postMONARCH** HR only (+0.38); the **palbociclib** penalty and prior-drug
-  residual have ~0 effect on the switch trials — exactly as the mechanism
-  dictates.
+  **MAINTAIN** HR only (+0.47, ≈0 for postMONARCH); the **abemaciclib** penalty
+  affects **postMONARCH** HR only (+0.25, ≈0 for MAINTAIN); the **palbociclib**
+  penalty and prior-drug residual have ~0 effect on the switch trials — exactly as
+  the mechanism dictates.
 
 ---
 
-## 8. Conclusions
+## 9. Conclusions
 
 1. A reduced-state QSP model built on the cyclin D–CDK4/6–RB–E2F switch, ER input
    and a CDK2/cyclin E bypass, with agent-specific potency and prior-drug
@@ -179,14 +231,15 @@ switch-responsive fraction is the logical next trial-design step.
 
 ---
 
-## 9. Reproducibility
-`Rscript R/99_run_all.R` regenerates every figure and table (~2 min, R 4.3.3,
+## 10. Reproducibility
+`Rscript R/99_run_all.R` regenerates every figure and table (~5 min, R 4.3.3,
 `deSolve` 1.40, `survival`, `ggplot2`, `lhs`). Modules: `00_config` (parameters,
 drug/ET/resistance-state libraries), `01_model` (ODE + G1/S solver),
 `02_calibration` (preclinical), `03_virtual_population`, `04_trials`,
-`05_figures`, `06_sensitivity`.
+`05_figures`, `06_sensitivity`, `07_validation` (verification, leave-one-trial-out
+CV, bootstrap prediction intervals).
 
-## 10. Key references (retrieved from PubMed)
+## 11. Key references (retrieved from PubMed)
 MAINTAIN [DOI](https://doi.org/10.1200/JCO.22.02392); PACE
 [DOI](https://doi.org/10.1200/JCO.23.01940); postMONARCH
 [DOI](https://doi.org/10.1200/JCO-24-02086); PALMIRA
@@ -197,3 +250,35 @@ MAINTAIN [DOI](https://doi.org/10.1200/JCO.22.02392); PACE
 [DOI](https://doi.org/10.1038/s41540-025-00604-z); meta-analysis
 [DOI](https://doi.org/10.7759/cureus.73738). Full list in
 `proposal/research_proposal.md`. *Please cite the original articles via the DOIs.*
+
+---
+
+## Appendix A. Key parameters (from `R/00_config.R`)
+
+| Parameter | Value | Role | Provenance |
+|---|---|---|---|
+| kER_syn, kER_deg | 1.0, 1.0 | ER production / turnover | normalised reference |
+| estrogen | 1.0 | ligand drive (postmenopausal) | normalised reference |
+| kD_syn, kD_deg | 1.2, 1.0 | cyclin D synthesis / decay | default |
+| wER, wGF | 0.70, 0.30 | ER vs growth-factor drive on cyclin D | default (ER-dominant) |
+| cdk46_cap, p16 | 1.0, 0.10 | CDK4/6 capacity, INK4 tone | normalised |
+| kE_syn, cdk2_cap, cdk2_basal | 0.70, 0.50, 0.04 | CDK2/cyclin-E bypass strength | calibrated (preclinical + dynamic range) |
+| kp46, kp2, kdp_RB | 1.50, 1.20, 1.0 | RB phosphorylation (CDK4/6, CDK2), dephosphorylation | calibrated |
+| E2F_K, E2F_n | 0.45, 2.2 | restriction-point Hill (graded) | calibrated (partial responses) |
+| S_K, S_n | 0.42, 2 | S-phase-entry Hill | calibrated |
+| g_vol, death_bas, kill_scale | 0.0060, 0.0008, 0.0015 | tumour growth / loss / cytotoxicity (per day) | calibrated to HR+ MBC PFS scale |
+| er_dependence | 0.55 | ER-dependence of proliferation | calibrated (ET monotherapy effect) |
+| CDK6 penalty (palbo/ribo/abema) | 9.0 / 2.6 / 1.6 | drug-specific potency loss under CDK6 remodelling | calibrated to T47D switching [7] |
+| drug θ (palbo/ribo/abema) | 8 / 8 / 10 | effective exposure / CDK4/6 IC50 | `data/drug_pk.csv` (literature-informed) |
+| PRIOR_RESIDUAL | 0.12 | residual activity of a re-used (already-failed) agent | calibrated to PACE/PALMIRA nulls |
+
+Resistance-state archetypes (multiplicative perturbations of the above) and their
+provenance are defined in `R/00_config.R::RESISTANCE_STATES`; drug-exposure
+provenance is in `data/drug_pk.csv`; preclinical and clinical calibration targets
+are in `data/preclinical_T47D.csv` and `data/clinical_trials.csv`.
+
+## Appendix B. Output inventory
+Figures `fig01`–`fig12` and tables `table_calibration_T47D`, `table_main_results`,
+`table_trial_fits`, `table_fsr_identifiability`, `table_hypothesis_tests`,
+`table_sensitivity_prcc`, `table_verification`, `table_loo_cv`,
+`table_prediction_intervals`, `table_validation_summary` (in `results/`).

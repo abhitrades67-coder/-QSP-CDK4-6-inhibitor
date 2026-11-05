@@ -1,0 +1,6 @@
+"criterion","value"
+"Experimental-arm median PFS RMSE (months)","1.27"
+"log-HR RMSE","0.169"
+"Predicted HR within observed CI (of 4)","3 / 4"
+"Correct HR direction (of 4)","3 / 4"
+"LOO-CV: held-out HR within observed CI (of 4)","3 / 4"

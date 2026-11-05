@@ -101,8 +101,10 @@ All steps run in R (`deSolve`, `survival`, `ggplot2`, `patchwork`, `lhs`, `data.
 ## 5. Validation plan and success criteria
 1. **Preclinical face validity:** the model reproduces the sign of the T47D switch responses and the order-of-magnitude pRB-potency differential. *(Success: all response directions correct; differential consistent with the experimental lower bound.)*
 2. **Clinical reproduction:** predicted experimental-arm HRs lie within, or adjacent to, the observed confidence intervals for ≥3 of 4 trials, with the correct sign for all four. *(Success criterion met if the switch-vs-continue dichotomy is reproduced.)*
-3. **Identifiability:** quantitative demonstration of which trials constrain the mechanism.
-4. **Sensitivity:** the drivers of benefit are mechanistically interpretable and agent-specific.
+3. **Model verification:** automated checks that the closed-form population layer matches the full ODE, the G1/S fixed point is unique/seed-independent, invariants hold (agnostic-clone insensitivity, prior-drug rule), and PFS is monotone in aggressiveness.
+4. **Out-of-sample validation:** **leave-one-trial-out cross-validation** — the resistance composition is calibrated on three trials and used to predict the held-out trial's HR, with bootstrap virtual-population prediction intervals. *(Success: ≥3 of 4 held-out HRs within the observed CI.)*
+5. **Identifiability:** quantitative demonstration of which trials constrain the mechanism.
+6. **Sensitivity:** the drivers of benefit are mechanistically interpretable and agent-specific (PRCC).
 
 ---
 

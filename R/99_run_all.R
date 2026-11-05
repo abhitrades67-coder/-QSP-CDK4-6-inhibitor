@@ -65,7 +65,7 @@ source(file.path(here, "05_figures.R"))
 # ---- 4. Global sensitivity analysis -----------------------------------------
 message("\n[4/5] Global sensitivity analysis (LHS + PRCC) ...")
 source(file.path(here, "06_sensitivity.R"))
-S <- run_sensitivity(N = 200, n_pat = 320, dt = 3)
+S <- run_sensitivity(N = 220, n_pat = 350, dt = 3)
 Pdf <- as.data.frame(S$prcc); Pdf$parameter <- rownames(Pdf)
 write.csv(Pdf, file.path(DIR_TAB, "table_sensitivity_prcc.csv"), row.names = FALSE)
 saveRDS(S, file.path(DIR_RES, "sensitivity.rds"))
@@ -93,8 +93,64 @@ saveRDS(S, file.path(DIR_RES, "sensitivity.rds"))
   ggsave(file.path(DIR_FIG, "fig10_sensitivity_prcc.png"), g, width = 9, height = 5.2, dpi = 150)
 }
 
-# ---- 5. Done ----------------------------------------------------------------
-message("\n[5/5] Pipeline complete.")
+# ---- 5. Verification, cross-validation & prediction intervals ---------------
+message("\n[5/6] Model verification, leave-one-trial-out CV, bootstrap PIs ...")
+source(file.path(here, "07_validation.R"))
+Vchk <- verify_model()
+write.csv(Vchk, file.path(DIR_TAB, "table_verification.csv"), row.names = FALSE)
+message("   verification checks all pass: ", all(Vchk$pass))
+BP <- bootstrap_predictions(comp, cal2$growth, B = 500, n = 1500, dt = 1)
+write.csv(BP, file.path(DIR_TAB, "table_prediction_intervals.csv"), row.names = FALSE)
+LOO <- loo_cv(n_search = 140, n_eval = 450, n_final = 1500, dt = 4, growth = cal2$growth)
+write.csv(LOO, file.path(DIR_TAB, "table_loo_cv.csv"), row.names = FALSE)
+rmse_pfs <- sqrt(mean((BP$exp_pfs_pred - BP$exp_pfs_obs)^2))
+rmse_loghr <- sqrt(mean((log(BP$hr_pred) - log(BP$hr_obs))^2))
+summary_tab <- data.frame(
+  criterion = c("Experimental-arm median PFS RMSE (months)","log-HR RMSE",
+                "Predicted HR within observed CI (of 4)","Correct HR direction (of 4)",
+                "LOO-CV: held-out HR within observed CI (of 4)"),
+  value = c(sprintf("%.2f", rmse_pfs), sprintf("%.3f", rmse_loghr),
+            sprintf("%d / 4", sum(BP$hr_pred>=BP$hr_obs_lo & BP$hr_pred<=BP$hr_obs_hi)),
+            sprintf("%d / 4", sum(sign(BP$hr_pred-1)==sign(BP$hr_obs-1))),
+            sprintf("%d / 4", sum(LOO$hr_in_CI))))
+write.csv(summary_tab, file.path(DIR_TAB, "table_validation_summary.csv"), row.names = FALSE)
+saveRDS(list(verification=Vchk, bootstrap=BP, loo=LOO, summary=summary_tab),
+        file.path(DIR_RES, "validation.rds"))
+
+# Forest plot with prediction CIs (fig11) and LOO-CV (fig12)
+{
+  bp <- BP; bp$trial <- factor(bp$trial, levels = rev(c("MAINTAIN","PACE","postMONARCH","PALMIRA")))
+  f11 <- ggplot(bp, aes(y = trial)) +
+    geom_vline(xintercept = 1, linetype = "dashed", colour = "grey50") +
+    geom_errorbarh(aes(xmin = hr_obs_lo, xmax = hr_obs_hi), height = 0.0, colour = "#4575b4", linewidth = 3, alpha = 0.25) +
+    geom_point(aes(x = hr_obs), colour = "#4575b4", size = 3) +
+    geom_errorbarh(aes(xmin = hr_pred_lo, xmax = hr_pred_hi), height = 0.16, colour = "#d73027") +
+    geom_point(aes(x = hr_pred), colour = "#d73027", shape = 18, size = 3.6) +
+    scale_x_log10(breaks = c(0.4,0.6,0.8,1.0,1.3)) +
+    labs(title = "Observed vs QSP-predicted PFS hazard ratios (with prediction intervals)",
+         subtitle = "Blue point/band = observed HR and CI; red diamond/bar = model prediction\nwith 95% bootstrap virtual-population (Monte-Carlo) interval.",
+         x = "Hazard ratio (experimental vs control, log scale)", y = NULL) +
+    theme_bw(base_size = 11) + theme(plot.title = element_text(face="bold", size=11),
+         plot.subtitle = element_text(size=9, colour="grey30"), panel.grid.minor = element_blank())
+  ggsave(file.path(DIR_FIG, "fig11_forest_prediction_intervals.png"), f11, width = 8.4, height = 4.6, dpi = 150)
+
+  lo <- LOO; lo$trial <- factor(lo$held_out, levels = c("MAINTAIN","PACE","postMONARCH","PALMIRA"))
+  f12 <- ggplot(lo, aes(y = trial)) +
+    geom_vline(xintercept = 1, linetype = "dashed", colour = "grey50") +
+    geom_errorbarh(aes(xmin = hr_lo, xmax = hr_hi), height = 0.14, colour = "#4575b4") +
+    geom_point(aes(x = hr_obs), colour = "#4575b4", size = 3) +
+    geom_point(aes(x = hr_pred), colour = "#1b7837", shape = 17, size = 3.4) +
+    scale_x_log10(breaks = c(0.3,0.4,0.6,0.8,1.0,1.3)) +
+    labs(title = "Leave-one-trial-out cross-validation: held-out HR prediction",
+         subtitle = "Each trial HR predicted from a composition fit ONLY on the other three.\nBlue = observed (CI); green triangle = out-of-sample prediction.",
+         x = "Hazard ratio (log scale)", y = NULL) +
+    theme_bw(base_size = 11) + theme(plot.title = element_text(face="bold", size=11),
+         plot.subtitle = element_text(size=8.8, colour="grey30"), panel.grid.minor = element_blank())
+  ggsave(file.path(DIR_FIG, "fig12_loo_cv.png"), f12, width = 8.4, height = 4.4, dpi = 150)
+}
+
+# ---- 6. Done ----------------------------------------------------------------
+message("\n[6/6] Pipeline complete.")
 cat("\nFigures:\n"); print(list.files(DIR_FIG, pattern="\\.png$"))
 cat("\nTables:\n");  print(list.files(DIR_TAB, pattern="\\.csv$"))
 cat(sprintf("\nTotal elapsed: %.1f min\n",

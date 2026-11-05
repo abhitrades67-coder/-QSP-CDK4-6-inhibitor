@@ -26,6 +26,10 @@ which randomized trials can, and cannot, identify the operative mechanism.
 - Competing-hypothesis testing shows aggregate PFS does **not** uniquely identify
   the mechanism; the observed modest benefits imply **predominantly
   CDK4/6-agnostic** resistance after palbociclib.
+- **Out-of-sample validation:** leave-one-trial-out cross-validation predicts the
+  held-out trial's HR within its observed CI for **3 of 4** trials; 7/7 model
+  verification checks pass (ODE/closed-form agreement, seed-independent fixed
+  point, agnostic-clone invariance, etc.).
 
 See `report/final_report.md` for results and `proposal/research_proposal.md` for
 the full proposal.
@@ -48,9 +52,10 @@ the full proposal.
 │   ├── 04_trials.R                   # trial simulation, calibration, hypothesis tests
 │   ├── 05_figures.R                  # figures + summary tables
 │   ├── 06_sensitivity.R             # global sensitivity (LHS + PRCC)
+│   ├── 07_validation.R               # verification, leave-one-trial-out CV, bootstrap PIs
 │   └── 99_run_all.R                  # master script (runs everything)
 └── results/
-    ├── figures/   fig01..fig10 (.png)
+    ├── figures/   fig01..fig12 (.png)
     └── tables/    table_*.csv
 ```
 
@@ -63,13 +68,14 @@ Requires R (≥4.3) with `deSolve`, `survival`, `ggplot2`, `patchwork`, `scales`
 Rscript R/99_run_all.R
 ```
 
-Runtime ≈ 2 minutes. Outputs are written to `results/figures/` and
+Runtime ≈ 5 minutes. Outputs are written to `results/figures/` and
 `results/tables/`. Individual stages can be run directly, e.g.:
 
 ```bash
 cd R && Rscript 02_calibration.R     # preclinical calibration
 cd R && Rscript 04_trials.R          # trial calibration + hypothesis tests
 cd R && Rscript 06_sensitivity.R     # global sensitivity analysis
+cd R && Rscript 07_validation.R      # verification + leave-one-out CV + prediction intervals
 ```
 
 ## Model in one paragraph

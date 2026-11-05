@@ -1,0 +1,8 @@
+"check","pass","detail"
+"ODE vs closed-form net growth rate",TRUE,"max |diff| = 4.28e-12 (tol 1e-6)"
+"ER ODE reaches analytic steady state",TRUE,"|diff| = 5.55e-17"
+"G1/S fixed point is seed-independent",TRUE,"range over seeds = 2.22e-16"
+"RB-loss clone is CDK4/6i-agnostic",TRUE,"max rate change by any CDK4/6i = 0.00e+00"
+"palbociclib re-challenge ~ ET (prior-drug rule)",TRUE,"max |continue - ET| rate = 7.21e-05"
+"PFS monotonically decreasing in aggressiveness",TRUE,"PFS = 17.12 > 7.89 > 4.4 > 2.76"
+"RECIST threshold = +20%% diameter (1.728x volume)",TRUE,"vol ratio = 1.728"

@@ -1,0 +1,5 @@
+"held_out","trained_on","exp_pfs_obs","exp_pfs_pred","hr_obs","hr_pred","hr_lo","hr_hi","composition","hr_in_CI"
+"MAINTAIN","PACE+postMONARCH+PALMIRA",5.29,3.02258726899384,0.57,0.694300805136018,0.39,0.85,"sensitive=0.06; cdk6_remodel=0.01; cdk2_bypass=0.06; rb_loss=0.82; er_reactivation=0.05",TRUE
+"PACE","MAINTAIN+postMONARCH+PALMIRA",4.6,4.79671457905544,1.11,0.985936064967975,0.79,1.55,"sensitive=0.01; cdk6_remodel=0.02; cdk2_bypass=0.09; rb_loss=0.67; er_reactivation=0.21",TRUE
+"postMONARCH","MAINTAIN+PACE+PALMIRA",6,7.75359342915811,0.73,0.277369641013467,0.57,0.95,"sensitive=0.18; cdk6_remodel=0.05; cdk2_bypass=0.33; rb_loss=0.36; er_reactivation=0.09",FALSE
+"PALMIRA","MAINTAIN+PACE+postMONARCH",4.9,3.59753593429158,0.84,0.989575799814925,0.66,1.07,"sensitive=0.06; cdk6_remodel=0.01; cdk2_bypass=0.06; rb_loss=0.82; er_reactivation=0.05",TRUE

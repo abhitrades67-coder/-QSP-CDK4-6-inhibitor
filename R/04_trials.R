@@ -79,20 +79,23 @@ aggress_curve <- function(pop, growth, control_arm = "ET_only",
 }
 
 aggress_for_target <- function(curve, target_pfs) {
-  # curve$pfs is decreasing in a; interpolate a at target
+  # curve$pfs is decreasing in a; interpolate a at target. Ties in the discrete
+  # median-PFS grid are averaged by approx (ties = "ordered"); suppress the
+  # cosmetic "collapsing to unique x values" note.
   o <- order(curve$pfs)
-  a <- approx(curve$pfs[o], curve$a[o], xout = target_pfs, rule = 2)$y
+  a <- suppressWarnings(
+    approx(curve$pfs[o], curve$a[o], xout = target_pfs, rule = 2, ties = mean)$y)
   min(max(a, min(curve$a)), max(curve$a))
 }
 
 # ---- Evaluate one composition against all trials ----------------------------
 evaluate_composition <- function(comp, n = 500, dt = 3, seed = 7,
-                                 growth = NULL) {
+                                 growth = NULL, which_trials = names(TRIALS)) {
   if (is.null(growth)) growth <- precompute_growth()
   pop <- make_population(n, comp, seed = seed)
   curve <- aggress_curve(pop, growth, "ET_only", dt = dt)
 
-  rows <- lapply(names(TRIALS), function(tn) {
+  rows <- lapply(which_trials, function(tn) {
     tr <- TRIALS[[tn]]
     a  <- aggress_for_target(curve, tr$ctrl_pfs)
     ctrl <- simulate_arm_pfs(pop, tr$control_arm, growth, aggress_scale = a, dt = dt)
@@ -126,15 +129,17 @@ simplex_from_lhs <- function(u) {
 }
 
 calibrate_composition <- function(n_search = 160, n_eval = 450, dt = 4,
-                                  seed = 101) {
+                                  seed = 101, which_trials = names(TRIALS),
+                                  growth = NULL) {
   set.seed(seed)
-  growth <- precompute_growth()
+  if (is.null(growth)) growth <- precompute_growth()
   L <- lhs::randomLHS(n_search, 5)
   best <- NULL; best_obj <- Inf; best_res <- NULL
   objs <- numeric(n_search)
   for (i in seq_len(n_search)) {
     comp <- setNames(simplex_from_lhs(L[i, ]), STATE_NAMES)
-    res <- evaluate_composition(comp, n = n_eval, dt = dt, seed = 7, growth = growth)
+    res <- evaluate_composition(comp, n = n_eval, dt = dt, seed = 7, growth = growth,
+                                which_trials = which_trials)
     o <- attr(res, "objective")
     objs[i] <- o
     if (is.finite(o) && o < best_obj) { best_obj <- o; best <- comp; best_res <- res }
@@ -179,7 +184,7 @@ analyse_fsr <- function(growth, n = 700, dt = 2, seed = 11,
     # f_sr matching observed experimental PFS (if within reachable range)
     o <- order(expv)
     fsr_hat <- if (tr$exp_pfs >= min(expv) && tr$exp_pfs <= max(expv)) {
-      approx(expv[o], fsr_grid[o], xout = tr$exp_pfs)$y
+      suppressWarnings(approx(expv[o], fsr_grid[o], xout = tr$exp_pfs, ties = mean)$y)
     } else NA_real_
     data.frame(trial = tn, aggress = a,
                exp_pfs_obs = tr$exp_pfs,
